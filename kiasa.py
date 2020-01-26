@@ -20,7 +20,7 @@ class Kiasa:
 			func = lambda x: self.alphabeta(copy(self.chess), x, 0)
 			values = {k: v for k, v in zip(moves, pool.map(func, moves))}
 		try:
-			if not self.chess.turn:
+			if self.chess.turn():
 				move = max(values.items(), key=lambda x: x[1])[0]
 				print(f'utility {max(values.items(), key=lambda x: x[1])[1]}')
 			else:

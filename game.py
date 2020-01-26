@@ -22,6 +22,7 @@ class Game:
 			return False
 
 	def __getitem__(self, pos):
+		return self.chess[pos]
 		if type(pos) == int:
 			return self.chess.board.piece_at(pos)
 		elif type(pos) == str:
