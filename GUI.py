@@ -87,9 +87,9 @@ if __name__ == '__main__':
 	first = ()
 	second = ()
 	board_update()
-	#while True:
-	#	board_update()
-	#	playsound('placement.mp3')
-	#	game.answer()
+	while True:
+		board_update()
+		playsound('placement.mp3')
+		game.answer()
 	master.mainloop()
 	
