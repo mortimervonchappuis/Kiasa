@@ -49,6 +49,8 @@ def board_update():
 
 
 if __name__ == '__main__':
+	self_play = False
+	
 	master = Tk()
 	master.title("KIASA Chess-Engine") # (Kasparov Is A Sexist Arsehole)
 	board = Image.open("board.png")
@@ -87,7 +89,7 @@ if __name__ == '__main__':
 	first = ()
 	second = ()
 	board_update()
-	while True:
+	while self_play:
 		board_update()
 		playsound('placement.mp3')
 		game.answer()
