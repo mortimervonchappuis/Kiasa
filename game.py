@@ -8,13 +8,16 @@ class Game:
 		self.kiasa = Kiasa()
 
 	def __call__(self, move):
-		if self.chess.legal(move):
-			self.kiasa.chess(move)
-			self.chess(move)
-			if self.chess.board.is_game_over():
-				print("CHECKMATE!")
-			return True
-		else:
+		try:
+			if self.chess.legal(move):
+				self.kiasa.chess(move)
+				self.chess(move)
+				if self.chess.board.is_game_over():
+					print("CHECKMATE!")
+				return True
+			else:
+				return False
+		except:
 			return False
 
 	def __getitem__(self, pos):
