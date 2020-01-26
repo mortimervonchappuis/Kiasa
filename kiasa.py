@@ -4,7 +4,7 @@ import pathos.pools as p
 
 
 class Kiasa:
-	def __init__(self, depth=0, offset=2):
+	def __init__(self, depth=4, offset=2):
 		self.chess = Board()
 		self.min_depth = depth
 		self.max_depth = depth + offset
@@ -17,7 +17,7 @@ class Kiasa:
 			self.chess(move)
 			return move
 		with p.ProcessPool(4) as pool:
-			func = lambda x: self.alphabeta(copy(self.chess), x, 0)
+			func = lambda x: self.alphabeta(copy(self.chess), x, 1)
 			values = {k: v for k, v in zip(moves, pool.map(func, moves))}
 		try:
 			if self.chess.turn():

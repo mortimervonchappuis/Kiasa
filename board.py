@@ -23,12 +23,12 @@ class Board:
 	def __call__(self, move):
 		if type(move) == str:
 			move = chess.Move.from_uci(move)
-		self.board.push(move)
 		if self.board.is_castling(move):
-			if not self.turn():
+			if self.turn():
 				self.white_castling = True
 			else:
 				self.black_castling = True
+		self.board.push(move)
 
 	def is_capture(self, move):
 		return self.board.is_capture(move)
@@ -43,9 +43,9 @@ class Board:
 		return self.board.turn
 
 	def utility(self):
-		rank_factor = 0.2
-		file_factor = 0.04
-		castling_factor = 2
+		rank_factor = 0.1
+		file_factor = 0.02
+		castling_factor = 1.2
 		check_factor = 0.8
 
 		if self.board.is_game_over():
