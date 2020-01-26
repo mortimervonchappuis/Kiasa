@@ -46,6 +46,7 @@ class Board:
 		rank_factor = 0.2
 		file_factor = 0.04
 		castling_factor = 2
+		check_factor = 0.8
 
 		if self.board.is_game_over():
 			if self.board.is_checkmate():
@@ -75,5 +76,10 @@ class Board:
 			score -= castling_factor
 		elif not self.board.has_castling_rights(False):
 			score += castling_factor
+		if self.board.is_check():
+			if self.turn():
+				score -= check_factor
+			else:
+				score += check_factor
 		return score
 
