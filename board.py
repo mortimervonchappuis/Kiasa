@@ -50,7 +50,7 @@ class Board:
 
 		if self.board.is_game_over():
 			if self.board.is_checkmate():
-				if self.turn:
+				if self.turn():
 					return float('-inf')
 				else:
 					return float('inf')

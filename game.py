@@ -13,7 +13,8 @@ class Game:
 				self.kiasa.chess(move)
 				self.chess(move)
 				if self.chess.board.is_game_over():
-					print("CHECKMATE!")
+					print('The Game is over!')
+					quit()
 				return True
 			else:
 				return False
