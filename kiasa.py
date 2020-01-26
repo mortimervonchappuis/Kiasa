@@ -4,7 +4,7 @@ import pathos.pools as p
 
 
 class Kiasa:
-	def __init__(self, depth=4, offset=2):
+	def __init__(self, depth=4, offset=1):
 		self.chess = Board()
 		self.min_depth = depth
 		self.max_depth = depth + offset

@@ -90,8 +90,8 @@ if __name__ == '__main__':
 	second = ()
 	board_update()
 	while self_play:
-		board_update()
-		#playsound('placement.mp3')
 		game.answer()
+		board_update()
+		playsound('placement.mp3')
 	master.mainloop()
 	
