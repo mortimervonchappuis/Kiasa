@@ -25,7 +25,7 @@ class Board:
 			move = chess.Move.from_uci(move)
 		self.board.push(move)
 		if self.board.is_castling(move):
-			if not self.board.turn():
+			if not self.turn():
 				self.white_castling = True
 			else:
 				self.black_castling = True
