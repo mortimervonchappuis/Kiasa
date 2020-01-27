@@ -4,10 +4,12 @@ from game import Game
 from time import sleep
 from playsound import playsound
 from chess import SQUARE_NAMES as sqn
+from matplotlib import pyplot as plt
+from math import exp
 
 
 def mouse_click(event=None):
-	global first, second, game
+	global first, second, game, utilities
 	if not game.chess.turn:
 		return
 	x = event.x
@@ -22,15 +24,17 @@ def mouse_click(event=None):
 					if game(sqn[first] + sqn[second]) or game(sqn[first] + sqn[second] + 'q'):
 						board_update()
 						playsound('placement.mp3')
-						game.answer()
+						utility = game.answer()
+						utilities.append((utilities[-1] + sigmoid(utility))/2)
 						board_update()
+						statistics_update()
 						playsound('placement.mp3')
 					first, second = (), ()
 
 
 def board_update():
 	global game, master, full_board
-	newboard = Image.open("board.png")
+	newboard = Image.open('board.png')
 	newboard = newboard.resize((800,800), Image.ANTIALIAS)
 	for i in range(8):
 		for j in range(8):
@@ -48,25 +52,39 @@ def board_update():
 	return
 
 
+def statistics_update():
+	global statistics, label, plt, utilities
+	ax.stackplot(list(range(len(utilities))), utilities, colors = ['#ffffff'])
+	#plt.ylim(0, 1)
+	plt.xticks(list(range(len(utilities))))
+	plt.xlim(0, len(utilities)-1)
+	plt.savefig('tmp.png')
+	img = ImageTk.PhotoImage(Image.open('tmp.png'))
+	label.configure(image=img)
+	label.image = img
+	statistics.update()
+
+
 if __name__ == '__main__':
-	self_play = True
+	self_play = False
 
 	master = Tk()
-	master.title("KIASA Chess-Engine") # (Kasparov Is A Sexist Arsehole)
-	board = Image.open("board.png")
+	master.title('KIASA Chess-Engine') # (Kasparov Is A Sexist Arsehole)
+	board = Image.open('board.png')
 	
-	R = Image.open("rook_white.png")
-	N = Image.open("knight_white.png")
-	B = Image.open("bishop_white.png")
-	K = Image.open("king_white.png")
-	Q = Image.open("queen_white.png")
-	P = Image.open("pawn_white.png")
-	r = Image.open("rook_black.png")
-	n = Image.open("knight_black.png")
-	b = Image.open("bishop_black.png")
-	k = Image.open("king_black.png")
-	q = Image.open("queen_black.png")
-	p = Image.open("pawn_black.png")
+	
+	R = Image.open('rook_white.png')
+	N = Image.open('knight_white.png')
+	B = Image.open('bishop_white.png')
+	K = Image.open('king_white.png')
+	Q = Image.open('queen_white.png')
+	P = Image.open('pawn_white.png')
+	r = Image.open('rook_black.png')
+	n = Image.open('knight_black.png')
+	b = Image.open('bishop_black.png')
+	k = Image.open('king_black.png')
+	q = Image.open('queen_black.png')
+	p = Image.open('pawn_black.png')
 	
 	R = R.resize((100,100), Image.ANTIALIAS)
 	N = N.resize((100,100), Image.ANTIALIAS)
@@ -84,14 +102,40 @@ if __name__ == '__main__':
 	tkimage = ImageTk.PhotoImage(board)
 	full_board = Label(master, image=tkimage)
 	full_board.pack()
-	full_board.bind("<ButtonPress-1>", func=mouse_click)
+	full_board.bind('<ButtonPress-1>', func=mouse_click)
 	game = Game()
 	first = ()
 	second = ()
 	board_update()
-	while self_play:
-		game.answer()
+
+	statistics = Toplevel()
+	#statistics.title('KIASA Statistics')
+	sigmoid = lambda x: 1/(1+exp(-x*0.2))
+	utilities = [0.5]
+
+	fig, ax = plt.subplots()
+	ax.stackplot(list(range(len(utilities))), utilities, colors = ['#ffffff'])
+	ax.set_title('KIASA Statistics')
+	ax.set_xlabel('Move')
+	ax.set_ylabel('Winning Percentage')
+	ax.set_facecolor("black")
+
+	#plt.plot(list(range(len(utilities))), utilities)
+	plt.ylim(0, 1)
+	plt.xlim(0, 1)
+	plt.savefig('tmp.png')
+	plt.xticks(list(range(len(utilities))))
+	plt.yticks([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], labels=[f'{str(x)}%' for x in range(0, 101, 10)])
+	#plt.style.use('dark_background')
+	tkimage_s = ImageTk.PhotoImage(Image.open('tmp.png'))
+	label = Label(statistics, image=tkimage_s)
+	label.pack()
+
+	while self_play and not game.chess.board.is_game_over():
+		utility = game.answer()
 		board_update()
+		utilities.append((utilities[-1] + sigmoid(utility))/2)
+		statistics_update()
 		playsound('placement.mp3')
 	master.mainloop()
 	

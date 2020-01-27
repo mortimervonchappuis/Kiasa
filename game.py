@@ -29,5 +29,6 @@ class Game:
 			return self.chess.board.piece_at(chess.SQUARE_NAMES.index(pos))
 
 	def answer(self):
-		move = self.kiasa()
-		self.board = self.chess(move)
+		move, util = self.kiasa()
+		self.chess(move)
+		return util
