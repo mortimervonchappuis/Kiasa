@@ -10,31 +10,32 @@ from math import exp
 
 def mouse_click(event=None):
 	global first, second, game, utilities
-	if not game.chess.turn:
+	if not game.chess.turn or game.chess.board.is_game_over():
 		return
 	x = event.x
 	y = event.y
 	for row in range(8):
 		for column in range(7, -1, -1):
 			if ((row * 100 + 50 - y) ** 2 + (column * 100 + 50 - x) ** 2) ** 0.5 <= 50:
-				if not first:
+				if first is None:
 					first = (7-row) * 8 + column
 				else:
 					second = (7-row) * 8 + column
 					if game(sqn[first] + sqn[second]) or game(sqn[first] + sqn[second] + 'q'):
 						board_update()
 						playsound('placement.mp3')
-						utility = game.answer()
-						utilities.append((utilities[-1] + sigmoid(utility))/2)
-						board_update()
-						statistics_update()
-						playsound('placement.mp3')
-					first, second = (), ()
+						if not game.chess.board.is_game_over():
+							utility = game.answer()
+							utilities.append(sigmoid(utility))
+							board_update()
+							statistics_update()
+							playsound('placement.mp3')
+					first, second = None, None
 
 
 def board_update():
 	global game, master, full_board
-	newboard = Image.open('board.png')
+	newboard = Image.open('board_planetary_grey.png')
 	newboard = newboard.resize((800,800), Image.ANTIALIAS)
 	for i in range(8):
 		for j in range(8):
@@ -49,13 +50,11 @@ def board_update():
 	master.update()
 	if game.chess.board != game.kiasa.chess.board:
 		print(game.chess.board, game.kiasa.chess.board)
-	return
 
 
 def statistics_update():
 	global statistics, label, plt, utilities
 	ax.stackplot(list(range(len(utilities))), utilities, colors = ['#ffffff'])
-	#plt.ylim(0, 1)
 	plt.xticks(list(range(len(utilities))))
 	plt.xlim(0, len(utilities)-1)
 	plt.savefig('tmp.png')
@@ -66,11 +65,12 @@ def statistics_update():
 
 
 if __name__ == '__main__':
-	self_play = False
+	self_play = True
 
 	master = Tk()
+	master.geometry("800x800+0+0")
 	master.title('KIASA Chess-Engine') # (Kasparov Is A Sexist Arsehole)
-	board = Image.open('board.png')
+	board = Image.open('board_planetary_grey.png')
 	
 	
 	R = Image.open('rook_white.png')
@@ -104,18 +104,18 @@ if __name__ == '__main__':
 	full_board.pack()
 	full_board.bind('<ButtonPress-1>', func=mouse_click)
 	game = Game()
-	first = ()
+	first, second = None, None
 	second = ()
 	board_update()
 
-	statistics = Toplevel()
-	#statistics.title('KIASA Statistics')
+	statistics = Toplevel(master)
+	statistics.title('KIASA Statistics')
+	statistics.geometry("1000x400+800+0")
 	sigmoid = lambda x: 1/(1+exp(-x*0.2))
 	utilities = [0.5]
 
-	fig, ax = plt.subplots()
+	fig, ax = plt.subplots(figsize=(10, 4))
 	ax.stackplot(list(range(len(utilities))), utilities, colors = ['#ffffff'])
-	ax.set_title('KIASA Statistics')
 	ax.set_xlabel('Move')
 	ax.set_ylabel('Winning Percentage')
 	ax.set_facecolor("black")
@@ -123,9 +123,9 @@ if __name__ == '__main__':
 	#plt.plot(list(range(len(utilities))), utilities)
 	plt.ylim(0, 1)
 	plt.xlim(0, 1)
-	plt.savefig('tmp.png')
 	plt.xticks(list(range(len(utilities))))
 	plt.yticks([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], labels=[f'{str(x)}%' for x in range(0, 101, 10)])
+	plt.savefig('tmp.png')
 	#plt.style.use('dark_background')
 	tkimage_s = ImageTk.PhotoImage(Image.open('tmp.png'))
 	label = Label(statistics, image=tkimage_s)
