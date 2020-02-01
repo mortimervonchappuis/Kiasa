@@ -66,6 +66,8 @@ def statistics_update():
 
 if __name__ == '__main__':
 	self_play = True
+	opening_book = True
+	variation = True
 
 	master = Tk()
 	master.geometry("800x800+0+0")
@@ -73,12 +75,12 @@ if __name__ == '__main__':
 	board = Image.open('board_planetary_grey.png')
 	
 	
-	R = Image.open('rook_white.png')
-	N = Image.open('knight_white.png')
-	B = Image.open('bishop_white.png')
-	K = Image.open('king_white.png')
-	Q = Image.open('queen_white.png')
-	P = Image.open('pawn_white.png')
+	R = Image.open('rook_white_2.png')
+	N = Image.open('knight_white_2.png')
+	B = Image.open('bishop_white_2.png')
+	K = Image.open('king_white_2.png')
+	Q = Image.open('queen_white_2.png')
+	P = Image.open('pawn_white_2.png')
 	r = Image.open('rook_black.png')
 	n = Image.open('knight_black.png')
 	b = Image.open('bishop_black.png')
@@ -103,7 +105,7 @@ if __name__ == '__main__':
 	full_board = Label(master, image=tkimage)
 	full_board.pack()
 	full_board.bind('<ButtonPress-1>', func=mouse_click)
-	game = Game()
+	game = Game(opening_book, variation)
 	first, second = None, None
 	second = ()
 	board_update()
@@ -120,13 +122,12 @@ if __name__ == '__main__':
 	ax.set_ylabel('Winning Percentage')
 	ax.set_facecolor("black")
 
-	#plt.plot(list(range(len(utilities))), utilities)
 	plt.ylim(0, 1)
 	plt.xlim(0, 1)
 	plt.xticks(list(range(len(utilities))))
 	plt.yticks([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], labels=[f'{str(x)}%' for x in range(0, 101, 10)])
 	plt.savefig('tmp.png')
-	#plt.style.use('dark_background')
+
 	tkimage_s = ImageTk.PhotoImage(Image.open('tmp.png'))
 	label = Label(statistics, image=tkimage_s)
 	label.pack()

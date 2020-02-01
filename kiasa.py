@@ -4,11 +4,14 @@ from random import shuffle
 from copy import deepcopy as copy
 from board import *
 from time import time, sleep
+from math import exp
 
 
 class Kiasa:
-	def __init__(self, depth=4, offset=2):
+	def __init__(self, opening_book=True, variation=True, depth=3, offset=3):
 		self.chess = board()
+		self.opening_book = opening_book
+		self.variation = variation
 		self.min_depth = depth
 		self.max_depth = depth + offset
 		self.count = 0
@@ -17,16 +20,18 @@ class Kiasa:
 	def __call__(self):
 		with opening.open_reader("data/performance.bin") as book:
 			moves = [entry.move for entry in book.find_all(self.chess.board)]
-			if moves:
-				#shuffle(moves)
+			if moves and self.opening_book:
+				if self.variation:
+					shuffle(moves)
+				sigmoid = lambda x: 1/(1+exp(-x*0.3))
 				move = moves[0]
 				self.chess(move)
-				sleep(3)
+				sleep(1)
 				print(f"""
 OPENING MODE
 MOVE: {move}
 """)
-				return move, 0
+				return move, sigmoid(self.chess.util)
 		t = time()
 		moves = self.chess.legal_moves()
 		if len(list(moves)) == 1:

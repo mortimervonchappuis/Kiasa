@@ -3,9 +3,9 @@ from kiasa import *
 
 
 class Game:
-	def __init__(self):
+	def __init__(self, opening_book=True, variation=True):
 		self.chess = Board()
-		self.kiasa = Kiasa()
+		self.kiasa = Kiasa(opening_book=opening_book, variation=variation)
 
 	def __call__(self, move):
 		if self.chess.board.is_game_over():
