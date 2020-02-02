@@ -23,13 +23,15 @@ def mouse_click(event=None):
 					second = (7-row) * 8 + column
 					if game(sqn[first] + sqn[second]) or game(sqn[first] + sqn[second] + 'q'):
 						board_update()
-						playsound('placement.mp3')
+						if sound:
+							playsound('placement.mp3')
 						if not game.chess.board.is_game_over():
 							utility = game.answer()
 							utilities.append(sigmoid(utility))
 							board_update()
 							statistics_update()
-							playsound('placement.mp3')
+							if sound:
+								playsound('placement.mp3')
 					first, second = None, None
 
 
@@ -68,6 +70,7 @@ if __name__ == '__main__':
 	self_play = True
 	opening_book = True
 	variation = True
+	sound = False
 
 	master = Tk()
 	master.geometry("800x800+0+0")
@@ -137,6 +140,7 @@ if __name__ == '__main__':
 		board_update()
 		utilities.append((utilities[-1] + sigmoid(utility))/2)
 		statistics_update()
-		playsound('placement.mp3')
+		if sound:
+			playsound('placement.mp3')
 	master.mainloop()
 	

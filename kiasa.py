@@ -9,7 +9,7 @@ from math import exp
 
 class Kiasa:
 	def __init__(self, opening_book=True, variation=True, depth=3, offset=3):
-		self.chess = board()
+		self.chess = Board()
 		self.opening_book = opening_book
 		self.variation = variation
 		self.min_depth = depth
@@ -23,7 +23,7 @@ class Kiasa:
 			if moves and self.opening_book:
 				if self.variation:
 					shuffle(moves)
-				sigmoid = lambda x: 1/(1+exp(-x*0.3))
+				phi = lambda x: 1/(1+exp(-x))-0.5
 				move = moves[0]
 				self.chess(move)
 				sleep(1)
@@ -31,7 +31,7 @@ class Kiasa:
 OPENING MODE
 MOVE: {move}
 """)
-				return move, sigmoid(self.chess.util)
+				return move, phi(self.chess.util)
 		t = time()
 		moves = self.chess.legal_moves()
 		if len(list(moves)) == 1:
@@ -76,7 +76,7 @@ MOVE: {move}
 UTIL: {round(value, 3)}
 TIME: {timer} s
 NODE: {self.count}
-T/N:  {timer/self.count*1e3} ms""")
+ONCE: {round(timer/self.count*1e3, 3)} ms""")
 		self.chess(result)
 		return result, value
 
@@ -84,17 +84,12 @@ T/N:  {timer/self.count*1e3} ms""")
 	def alphabeta(self, chess, urgent, depth=0, alpha=float('-inf'), beta=float('inf')):
 		if chess.board.is_repetition(2):
 			return 0
+		if chess.board.is_game_over():
+			return chess.util
 
 		if (depth >= self.min_depth and not urgent) or depth >= self.max_depth:
 			return chess.util
-			if chess.turn():
-				return max((copy(chess)(move).util for move in chess.legal_moves()))
-			else:
-				return min((copy(chess)(move).util for move in chess.legal_moves()))
-		if (depth - 1 >= self.min_depth  and not urgent) or depth - 1 >= self.max_depth:
-			boards = ((copy(chess)(move), chess.is_capture(move) or chess.board.is_check()) for move in chess.legal_moves())
-		else:
-			boards = sorted(((copy(chess)(move), chess.is_capture(move) or chess.board.is_check()) for move in chess.legal_moves()), key=lambda x: x[0].util, reverse=chess.turn())
+		boards = sorted(((copy(chess)(move), chess.is_capture(move) or chess.board.is_check()) for move in chess.legal_moves()), key=lambda x: x[0].util, reverse=chess.turn())
 		if chess.turn():
 			value = float('-inf')
 			for board, urgent in boards:
@@ -113,4 +108,3 @@ T/N:  {timer/self.count*1e3} ms""")
 				if alpha >= beta:
 					break
 			return value
-
